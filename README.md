@@ -131,36 +131,3 @@ cd worker && npm install && npm run dev
 cd frontend && npm install && npm run dev
 ```
 
-## Push this project to GitHub
-
-Run these from the project root (`c:\Users\kaush\Downloads\Zapier`):
-
-```bash
-# 1. (one-time) make sure node_modules etc. are ignored
-echo "node_modules/" >> .gitignore
-echo "dist/" >> .gitignore
-echo ".env" >> .gitignore
-
-# 2. stage & commit current changes
-git add .
-git commit -m "Add README, docker-compose, and service updates"
-
-# 3. create a new empty repo on GitHub (via the website) named e.g. "zapier-clone"
-#    then wire it up as the remote:
-git remote add origin https://github.com/<your-username>/zapier-clone.git
-
-# if a remote already exists, update it instead:
-# git remote set-url origin https://github.com/<your-username>/zapier-clone.git
-
-# 4. push
-git branch -M main
-git push -u origin main
-```
-
-Subsequent pushes are just:
-
-```bash
-git add .
-git commit -m "your message"
-git push
-```
