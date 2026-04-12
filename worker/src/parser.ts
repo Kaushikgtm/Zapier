@@ -1,6 +1,6 @@
 
 export function parse(text: string, values: any, startDelimeter = "{", endDelimeter = "}") {
-    // You received {comment.amount} momey from {comment.link}
+    // You received {comment.amount} money from {comment.link}
     let startIndex = 0;
     let endIndex = 1;
 

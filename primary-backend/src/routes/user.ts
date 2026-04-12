@@ -1,103 +1,74 @@
-
 import { Router } from "express";
-import { authMiddleware } from "../middlewere";
-import { SigninSchema, SignupSchema } from "../types";
+import { authMiddleware } from "../middleware";
+import { signinSchema, signupSchema } from "../types";
 import { prismaClient } from "../db";
 import jwt from "jsonwebtoken";
 import { JWT_PASSWORD } from "../config";
 
 const router = Router();
 
-router.post("/signup", async (req, res) => {
-    const body = req.body;
-    const parsedData = SignupSchema.safeParse(body);
+router.post("/signup", async(req, res)=>{
+      //@ts-ignore
+      const body = req.body;
+      const parsedData = signupSchema.safeParse(body);
+      if(!parsedData.success){
+            return res.status(411).json({
+                  message: "you enter wrong datatype"
+            })
+      }
+      const userExist = await prismaClient.user.findFirst({
+            where: {
+                  email: parsedData.data?.name
+            }
+      })
+      if(userExist){
+            return res.status(403).json({
+                  message: "user with same name already exist"
+            })
+      }
 
-    if (!parsedData.success) {
-        console.log(parsedData.error);
-        return res.status(411).json({
-            message: "Incorrect inputs"
-        })
-    }
-
-    const userExists = await prismaClient.user.findFirst({
-        where: {
-            email: parsedData.data.username
-        }
-    });
-
-    if (userExists) {
-        return res.status(403).json({
-            message: "User already exists"
-        })
-    }
-
-    await prismaClient.user.create({
+      await prismaClient.user.create({
         data: {
             email: parsedData.data.username,
-            // TODO: Dont store passwords in plaintext, hash it
             password: parsedData.data.password,
             name: parsedData.data.name
         }
     })
-
-    // await sendEmail();
-
-    return res.json({
-        message: "Please verify your account by checking your email"
-    });
+      res.json({
+            message: "user account is created successfully"
+      })
 
 })
 
-router.post("/signin", async (req, res) => {
-    const body = req.body;
-    const parsedData = SigninSchema.safeParse(body);
+router.post("/signin", authMiddleware, async(req, res)=>{
+      //@ts-ignore
+      const id = req.id;
+      const body = req.body;
+      const parsedData = signinSchema.safeParse(body);
+      if(!parsedData.success){
+            return res.status(411).json({
+                  message: "you send a wrong datatype"
+            })
+      }
+      const userExist = await prismaClient.user.findFirst({
+            where: {
+                  email: parsedData.data.username,
+                  password: parsedData.data.password
+            }
+      })
+      if(!userExist){
+            return res.status(404).json({
+                  message: "you send a wrong id/ password"
+            })
+      }
+      //sign using jwt
+      const token = jwt.sign({
+            id: userExist.id
+      },JWT_PASSWORD)
 
-    if (!parsedData.success) {
-        return res.status(411).json({
-            message: "Incorrect inputs"
-        })
-    }
-
-    const user = await prismaClient.user.findFirst({
-        where: {
-            email: parsedData.data.username,
-            password: parsedData.data.password
-        }
-    });
-    
-    if (!user) {
-        return res.status(403).json({
-            message: "Sorry credentials are incorrect"
-        })
-    }
-
-    // sign the jwt
-    const token = jwt.sign({
-        id: user.id
-    }, JWT_PASSWORD);
-
-    res.json({
-        token: token,
-    });
+      res.json({
+            token: token
+      })
 })
 
-router.get("/", authMiddleware, async (req, res) => {
-    // TODO: Fix the type
-    // @ts-ignore
-    const id = req.id;
-    const user = await prismaClient.user.findFirst({
-        where: {
-            id
-        },
-        select: {
-            name: true,
-            email: true
-        }
-    });
-
-    return res.json({
-        user
-    });
-})
-
-export const userRouter = router;
+export const userRoute = router;
