@@ -13,7 +13,10 @@ RUN npm install
 #5 copy rest file
 COPY . .
 
-#6 build typescript 
+#6 Prisma generate
+RUN npx prisma generate
+
+#7 build typescript
 RUN npm run build
 
 #7 start the app
