@@ -1,0 +1,43 @@
+\chapter{Environment Variables}
+
+The following environment variables are required by the platform's services. They are typically supplied through a \texttt{.env} file in each service directory, and Docker Compose forwards them into the corresponding container at startup. The variables are summarised in Table~\ref{tab:env}.
+
+\begin{table}[h]
+\centering
+\caption{Environment variables used by the platform.}
+\label{tab:env}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|p{3.8cm}|p{4.5cm}|p{5cm}|}
+\hline
+\textbf{Variable} & \textbf{Used by} & \textbf{Purpose} \\ \hline
+\texttt{DATABASE\_URL} & primary backend, hook, worker & PostgreSQL connection string. \\ \hline
+\texttt{JWT\_PASSWORD} & primary backend & Secret used to sign and verify JSON Web Tokens. \\ \hline
+\texttt{KAFKA\_BROKERS} & processor, worker & Comma-separated list of Kafka broker addresses. \\ \hline
+\texttt{SMTP\_ENDPOINT} & worker & Hostname of the SMTP relay used for email actions. \\ \hline
+\texttt{SMTP\_USERNAME} & worker & Username for the SMTP relay. \\ \hline
+\texttt{SMTP\_PASSWORD} & worker & Password for the SMTP relay. \\ \hline
+\texttt{SOL\_PRIVATE\_KEY} & worker & Base58-encoded private key of the funding Solana wallet. \\ \hline
+\end{tabular}
+\end{table}
+
+\chapter{Sample Webhook Payload and Trace}
+{\setstretch{1.25}
+
+Listing~\ref{lst:sample-payload} shows a representative JSON payload that an external service might POST to a Zap's webhook URL. The corresponding sequence of state transitions observed inside the platform is shown immediately below.
+
+\begin{lstlisting}[language=JavaScript, caption={Sample webhook payload.}, label=lst:sample-payload]
+{
+  "user":    { "email": "recipient@example.com", "name": "Asha" },
+  "payment": { "amount": "0.25", "currency": "SOL" },
+  "wallet":  { "address": "9xQeWvG816bUx9EPjHmaT23yvVM2Z7trM5HEzy" }
+}
+\end{lstlisting}
+
+\begin{enumerate}[label=\arabic*., leftmargin=*, itemsep=2pt, parsep=2pt, topsep=2pt]
+\item The hook service inserts one \texttt{ZapRun} row (with the payload above stored in the \texttt{metadata} column) and one \texttt{ZapRunOutbox} row, in a single Prisma transaction.
+\item The processor, on its next poll, reads the outbox row and publishes the message \texttt{\{"zapRunId":"...","stage":0\}} to the \texttt{zap-events} Kafka topic, then deletes the outbox row.
+\item The worker consumes the message, loads the \texttt{Zap} along with its actions, and executes the action at \texttt{sortingOrder} 0 (in this example, an email to \texttt{recipient@example.com}).
+\item Because a second action exists, the worker publishes \texttt{\{"zapRunId":"...","stage":1\}} to Kafka and commits the offset of the first message.
+\item The worker consumes the second message and executes the action at \texttt{sortingOrder} 1 (a Solana transfer of 0.25 SOL to the address contained in the payload). The offset is committed and processing of this \texttt{ZapRun} is complete.
+\end{enumerate}
+}% end \setstretch group

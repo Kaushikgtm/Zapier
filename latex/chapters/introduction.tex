@@ -1,0 +1,36 @@
+\chapter{Introduction}
+
+\section{General}
+
+The rapid adoption of Software-as-a-Service (SaaS) tools has transformed the way modern organisations operate. Businesses today routinely use dozens of independent web applications for communication, customer relationship management, payments, file storage, analytics and marketing. Each of these applications is, in isolation, highly capable, but the real productivity gains for an organisation arise when these applications are able to exchange information and trigger actions in one another without manual intervention. This need to connect otherwise disjoint systems has given rise to the field of workflow automation, sometimes referred to as integration-platform-as-a-service (iPaaS).
+
+A workflow automation platform enables a non-technical user to define automated rules of the form: \emph{``when event X happens in service A, perform action Y in service B''}. Such rules eliminate repetitive manual tasks and reduce human error. Commercial platforms such as Zapier, Make and IFTTT have demonstrated the value of this category of software, with millions of users authoring millions of automations across a large catalogue of supported services.
+
+This project presents the design, implementation and evaluation of an open, self-hostable workflow automation system inspired by the architecture and user experience of the above products. The platform allows users to register, build workflows consisting of a single trigger followed by an ordered chain of actions, and expose a public webhook endpoint that external services can invoke to fire those workflows. The execution of the workflows is performed asynchronously by a pipeline of loosely coupled microservices that communicate through a persistent message broker, which gives the system its reliability and horizontal scalability.
+
+\section{Motivation}
+
+Three observations motivated the choice of this project. First, although commercial workflow automation tools have become indispensable to many organisations, their proprietary nature and per-task pricing make them unsuitable for self-hosting, for use with sensitive data, and for high-frequency automation. Second, the architectural style required to build such a platform draws together a number of important concepts from modern distributed systems, including message brokers, the transactional outbox pattern, stateless service replication and asynchronous event processing; an end-to-end implementation therefore offers significant pedagogical value. Third, the technology stack used in the project, comprising TypeScript, Node.js, Express, Next.js, Prisma, PostgreSQL, Apache Kafka and Docker, closely mirrors the toolchain used in modern professional web engineering, and so the resulting codebase is a direct rehearsal of industry practice.
+
+\section{Objectives}
+
+The specific objectives of the project are listed below.
+
+\begin{enumerate}[label=(\alph*)]
+\item To design a clean data model capable of representing users, workflows (called \emph{Zaps}), triggers, actions and workflow executions.
+\item To implement a REST API service that handles user authentication and exposes endpoints for the creation and retrieval of workflows.
+\item To implement a public webhook ingestion service that reliably records every incoming event into the database using the \emph{transactional outbox} pattern, thereby guaranteeing that no event is lost even if the downstream message broker is temporarily unavailable.
+\item To implement a processor service that reads unprocessed outbox entries from the database and publishes corresponding messages to an Apache Kafka topic.
+\item To implement a worker service that consumes messages from Kafka and executes the configured actions, including sending transactional emails and initiating Solana blockchain transactions.
+\item To implement a responsive web frontend using Next.js that enables a user to sign up, log in, build a workflow visually and inspect the webhook URL required to trigger it.
+\item To containerise the entire system using Docker and to configure a continuous-integration and continuous-deployment (CI/CD) pipeline that builds and deploys only the services whose source has changed on each commit.
+\item To evaluate the resulting platform against functional correctness criteria and simple performance metrics.
+\end{enumerate}
+
+\section{Scope of the Project}
+
+The scope of this report is limited to the design and implementation of the core platform described above. The platform supports a single trigger type (incoming HTTP webhook) and two action types (send transactional email over SMTP and send Solana cryptocurrency). The frontend supports the essential user journeys of signup, login, workflow creation and workflow listing; advanced UX features such as run-history visualisation, drag-and-drop reordering and analytics dashboards are explicitly out of scope. The deployment target is a single virtual machine running Docker Compose; production-grade concerns such as Kubernetes orchestration, autoscaling, multi-region replication and secret management with a vault are also out of scope for this iteration, although the architecture has been designed so that these can be added incrementally.
+
+\section{Organisation of the Report}
+
+The remainder of this report is organised as follows. Chapter~2 reviews the background concepts and prior art that inform the system's design, including workflow automation terminology, the microservices architectural style, the transactional outbox pattern, and event streaming with Apache Kafka. Chapter~3 formulates the problem in technical terms, identifies the principal constraints and lists the functional and non-functional requirements that the platform must satisfy. Chapter~4 describes the proposed solution: the architecture, data model and internal implementation of each of the services that together constitute the platform, along with the deployment pipeline. Chapter~5 presents the functional and qualitative results obtained by exercising the platform end-to-end. Chapter~6 concludes the report with a summary of the work performed and a discussion of avenues for future enhancement. The IEEE-formatted reference list and the appendices follow.

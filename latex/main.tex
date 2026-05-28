@@ -1,0 +1,377 @@
+%==========================================================
+%  PROJECT REPORT
+%  Design and Implementation of an Event-Driven Workflow
+%  Automation Platform
+%  Department of Computer Science & Engineering (Data Science)
+%  Saharsa College of Engineering, Saharsa
+%  Bihar Engineering University, Patna
+%==========================================================
+
+\documentclass[12pt, a4paper, oneside]{report}
+
+%--------------------- PACKAGES ---------------------
+% Margins per official guidelines: L=4.0 cm, R=2.5 cm, T=4.0 cm, B=2.5 cm
+\usepackage[left=4.0cm, right=2.5cm, top=4.0cm, bottom=2.5cm]{geometry}
+
+% Arial substitute (Helvetica). For true Arial, compile with XeLaTeX / LuaLaTeX
+% and replace the next two lines with:
+%   \usepackage{fontspec}
+%   \setmainfont{Arial}
+\usepackage[scaled]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[T1]{fontenc}
+
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc, shapes.multipart}
+\usepackage{tocloft}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{parskip}
+
+%--------------------- FORMATTING ---------------------
+\setstretch{1.5}                       % line spacing 1.5 per guidelines
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.8em}            % one blank line between paragraphs
+
+% Chapter title: Arial 14 pt bold, centered (per guidelines)
+\titleformat{\chapter}[display]
+  {\normalfont\centering\fontsize{14pt}{18pt}\bfseries}
+  {\MakeUppercase{Chapter \thechapter}}
+  {12pt}
+  {\fontsize{14pt}{18pt}\bfseries\MakeUppercase}
+\titlespacing*{\chapter}{0pt}{-20pt}{24pt}
+
+% Section (subtitle): Arial 12 pt bold, left justified
+\titleformat{\section}
+  {\normalfont\fontsize{12pt}{14pt}\bfseries\raggedright}
+  {\thesection}{1em}{}
+
+\titleformat{\subsection}
+  {\normalfont\fontsize{12pt}{14pt}\bfseries\raggedright}
+  {\thesubsection}{1em}{}
+
+% Caption style: 12 pt bold
+\captionsetup{font={bf, normalsize}, labelsep=colon}
+
+% Code listings style
+\definecolor{codegray}{gray}{0.95}
+\lstset{
+  backgroundcolor=\color{codegray},
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{gray},
+  stringstyle=\color{purple},
+  showstringspaces=false,
+  tabsize=2
+}
+
+% Two-sided headers / footers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE]{\nouppercase{\leftmark}}
+\fancyhead[LO]{\nouppercase{\rightmark}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyfoot[C]{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+}
+
+%--------------------- DOCUMENT ---------------------
+\begin{document}
+
+%==========================================================
+%  TITLE PAGE  (per official template)
+%==========================================================
+\begin{titlepage}
+\centering
+{\setstretch{1.0}
+
+% Title: Arial 14pt bold all caps centered
+{\fontsize{14pt}{18pt}\bfseries
+DESIGN AND IMPLEMENTATION OF AN EVENT-DRIVEN\\[2pt]
+WORKFLOW AUTOMATION PLATFORM\par}
+
+\vspace{0.5cm}
+
+{\fontsize{12pt}{14pt}\itshape A Project Report\par}
+
+\vspace{0.5cm}
+
+{\fontsize{12pt}{15pt}
+Submitted in Partial Fulfilment of the Requirements\\
+for the Award of the Degree of\par}
+
+\vspace{0.5cm}
+
+{\fontsize{12pt}{15pt}\bfseries Bachelor of Technology\par}
+\vspace{0.1cm}
+{\fontsize{12pt}{15pt} in\par}
+\vspace{0.1cm}
+{\fontsize{12pt}{15pt}\bfseries Computer Science \& Engineering (Data Science)\par}
+
+\vspace{0.6cm}
+
+{\fontsize{12pt}{15pt} Submitted by\par}
+\vspace{0.3cm}
+
+\begin{tabular}{l}
+\textbf{GAUTAM KAUSHIK}\quad Registration No.\ \texttt{22153132042} \\
+\end{tabular}
+
+\vspace{0.6cm}
+
+{\fontsize{12pt}{15pt} Under the supervision of\par}
+\vspace{0.2cm}
+{\fontsize{12pt}{15pt}\bfseries Dr.\ Ankur Priyadarshi\par}
+{\fontsize{12pt}{15pt} Assistant Professor\par}
+
+\vspace{0.4cm}
+
+% College logos: SCE (left) and BEU (right) side-by-side
+\includegraphics[height=2.2cm]{figures/sce_logo.png}%
+\hspace{1.5cm}%
+\includegraphics[height=2.2cm]{figures/beu_logo.jpeg}
+
+\vspace{0.3cm}
+
+{\fontsize{12pt}{15pt}\bfseries Department of Computer Science \& Engineering (Data Science)\par}
+{\fontsize{12pt}{15pt} Saharsa College of Engineering, Saharsa\par}
+{\fontsize{12pt}{15pt} Bihar Engineering University, Patna\par}
+
+\vspace{0.2cm}
+
+{\fontsize{12pt}{15pt}\bfseries [MONTH] 2026\par}
+}% end \setstretch group
+\end{titlepage}
+
+%==========================================================
+%  FRONT MATTER
+%==========================================================
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+% ----------- CERTIFICATE -----------
+\chapter*{Certificate}
+\addcontentsline{toc}{chapter}{Certificate}
+\thispagestyle{plain}
+{\setstretch{1.25}
+
+This is to certify that the project report entitled \textbf{``Design and Implementation of an Event-Driven Workflow Automation Platform''} which is submitted by \textbf{Gautam Kaushik} (Registration No.\ \texttt{22153132042}) in partial fulfilment of the requirement for the award of the degree of Bachelor of Technology in Computer Science \& Engineering (Data Science) of Saharsa College of Engineering, Saharsa (affiliated to Bihar Engineering University, Patna), is a record of the candidate's own work carried out by him under my supervision. The matter embodied in this project report is original and has not been submitted anywhere for the award of any other course credit, degree or diploma.
+
+\vspace{1.2cm}
+
+\noindent
+\begin{minipage}[t]{0.32\textwidth}
+\centering
+\rule{4cm}{0.4pt} \\
+\textbf{Dr.\ Ankur Priyadarshi} \\
+Project Supervisor \\
+SCE Saharsa
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\centering
+\rule{4cm}{0.4pt} \\
+\textbf{Dr.\ Ankur Priyadarshi} \\
+Head of Department \\
+Dept.\ of CSE (Data Science) \\
+SCE Saharsa
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\centering
+\rule{4cm}{0.4pt} \\
+\textbf{External Examiner}
+\end{minipage}
+}% end \setstretch group
+
+\clearpage
+
+% ----------- CANDIDATE'S DECLARATION -----------
+\chapter*{Declaration}
+\addcontentsline{toc}{chapter}{Declaration}
+\thispagestyle{plain}
+{\setstretch{1.2}
+
+\textit{(to be signed by the candidate)}
+
+\vspace{0.3cm}
+
+I, the undersigned, Registration Number as listed below, a registered candidate for the Undergraduate Programme (B.Tech) under the Department of Computer Science \& Engineering (Data Science) of Saharsa College of Engineering, Saharsa (affiliated to Bihar Engineering University, Patna), declare that this is my own original work and does not contain material for which the copyright belongs to a third party, and that it has not been presented and will not be presented to any other University or Institute for a similar or any other Degree award.
+
+I further confirm that for all third-party copyright material in my project report (including any electronic attachments), the material has either been ``blanked out'' from the copies of the report, or has been fully referenced and where possible accompanied by links (URL) to electronic sources of the material.
+
+I hereby transfer exclusive copyright for this report to \textbf{Saharsa College of Engineering, Saharsa}. The following rights are reserved by the author:
+
+\begin{itemize}[leftmargin=*, itemsep=0pt, parsep=2pt, topsep=2pt]
+\item The right to use, free of charge, all or part of this report in future work of my own, such as books and lectures, giving reference to the original place of publication and the copyright holder.
+\item The right to reproduce the report or parts of it for my own purpose, provided the copies are not offered for sale.
+\end{itemize}
+
+\vspace{0.3cm}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{|c|p{4.5cm}|p{3.2cm}|p{3.0cm}|}
+\hline
+\textbf{Sl.\ No.} & \textbf{Name of Candidate} & \textbf{Registration No.} & \textbf{Signature} \\ \hline
+1 & Gautam Kaushik  & 22153132042 & \\ \hline
+\end{tabular}
+\renewcommand{\arraystretch}{1.0}
+\end{center}
+
+\vspace{0.5cm}
+\noindent Date: \hrulefill \hfill Place: Saharsa
+}% end \setstretch group
+
+\clearpage
+
+% ----------- COPYRIGHT NOTICE -----------
+\chapter*{Copyright Notice}
+\addcontentsline{toc}{chapter}{Copyright Notice}
+\thispagestyle{plain}
+
+\vspace{1.0cm}
+
+\begin{center}
+\textbf{COPYRIGHT \textcopyright\ 2026 by Saharsa College of Engineering, Saharsa.}\\
+\textbf{All rights reserved.}
+\end{center}
+
+\vspace{0.8cm}
+
+No part of this publication may be reproduced, distributed or transmitted in any form or by any means, including photocopying, recording, or other electronic or mechanical methods, without the prior written permission of the copyright holder, except in the case of brief quotations embodied in critical scholarly reviews and certain other non-commercial uses with an acknowledgement or reference permitted by the copyright law.
+
+\clearpage
+
+% ----------- ACKNOWLEDGEMENT -----------
+\chapter*{Acknowledgement}
+\addcontentsline{toc}{chapter}{Acknowledgement}
+\thispagestyle{plain}
+{\setstretch{1.2}
+
+The successful completion of this project would not have been possible without the guidance, encouragement and support of several individuals to whom I wish to express my sincere gratitude.
+
+I would first like to extend my heartfelt thanks to my project supervisor, \textbf{Dr.\ Ankur Priyadarshi}, Assistant Professor and Head of the Department of Computer Science \& Engineering (Data Science), Saharsa College of Engineering, for his invaluable guidance, constant encouragement and scholarly suggestions throughout the course of this work. His expertise in the subject matter and his patience in answering my queries have been instrumental in shaping this project.
+
+I am deeply thankful to the faculty members of the Department of Computer Science \& Engineering (Data Science), SCE Saharsa, for their technical advice and thoughtful feedback during the various review stages of this project. Their constructive criticism helped me refine both the design and the implementation.
+
+I gratefully acknowledge the support of the administration of Saharsa College of Engineering and Bihar Engineering University, Patna for providing the laboratory facilities, internet access and development environment that made the implementation of this work possible.
+
+I also wish to thank the open-source community whose tools, documentation and reference implementations, including those for Next.js, Prisma, Apache Kafka and Node.js, formed the technical foundation on which this platform was built.
+
+Finally, I express my deepest gratitude to my parents, family and friends for their love, patience and moral support during every phase of this project. I owe a special debt of thanks to my mother, \textbf{Smt.\ Runa Devi}, whose unwavering encouragement, prayers and quiet sacrifice have been the foundation on which this work was built.
+
+}% end \setstretch group
+
+\clearpage
+
+% ----------- ABSTRACT -----------
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\thispagestyle{plain}
+{\setstretch{1.3}
+
+This project presents the design, implementation and evaluation of an open, self-hostable workflow automation platform inspired by the architecture of commercial integration-platform-as-a-service products. The platform enables end users to author automated workflows, called \emph{Zaps}, each consisting of a webhook trigger and an ordered chain of one or more actions, and to expose a public webhook URL through which external systems can fire those workflows.
+
+The system is implemented as five loosely coupled microservices written in TypeScript on Node.js: a Next.js frontend, a primary REST backend, a webhook ingestion service, an outbox-processor service and a worker service. PostgreSQL is used for all persistent state through the Prisma ORM, and Apache Kafka serves as the asynchronous channel between the processor and the worker. The webhook ingestion path is implemented using the \emph{transactional outbox} pattern, which guarantees that every received event is durably recorded and eventually processed even in the presence of broker outages or worker crashes. Sequential execution of multi-step workflows is achieved by having the worker republish each completed action's message with an incremented stage number, removing the need for shared in-memory state and enabling horizontal scaling through Kafka consumer groups.
+
+The complete platform has been containerised with Docker and equipped with a GitHub Actions continuous-deployment pipeline that rebuilds and redeploys only the services whose source has changed on each commit. Functional verification using a controlled set of test scenarios confirms that workflows execute correctly end-to-end, that no events are lost during simulated downstream failures, and that idempotent retry behaviour is preserved through Kafka's manual offset commit semantics. The platform serves both as a usable automation tool and as a compact reference implementation of an event-driven microservices architecture for academic study.
+
+\vspace{0.3cm}
+
+\noindent\textbf{Keywords:} Workflow automation; Microservices; Apache Kafka; Transactional outbox pattern; Event-driven architecture; PostgreSQL; Prisma; Next.js.
+}% end \setstretch group
+
+\clearpage
+
+% ----------- TABLE OF CONTENTS -----------
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchappagefont}{\bfseries}
+\tableofcontents
+\clearpage
+
+% ----------- LIST OF FIGURES -----------
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+\clearpage
+
+% ----------- LIST OF TABLES -----------
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+\clearpage
+
+% ----------- ABBREVIATIONS -----------
+\chapter*{Abbreviations}
+\addcontentsline{toc}{chapter}{Abbreviations}
+\thispagestyle{plain}
+
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{p{3.5cm} p{10cm}}
+\textbf{API}   & Application Programming Interface \\
+\textbf{CI/CD} & Continuous Integration / Continuous Deployment \\
+\textbf{CRUD}  & Create, Read, Update, Delete \\
+\textbf{ER}    & Entity-Relationship (diagram) \\
+\textbf{HTTP}  & HyperText Transfer Protocol \\
+\textbf{HTTPS} & HyperText Transfer Protocol Secure \\
+\textbf{iPaaS} & Integration Platform as a Service \\
+\textbf{JSON}  & JavaScript Object Notation \\
+\textbf{JWT}   & JSON Web Token \\
+\textbf{ORM}   & Object-Relational Mapper \\
+\textbf{REST}  & Representational State Transfer \\
+\textbf{RPC}   & Remote Procedure Call \\
+\textbf{SaaS}  & Software as a Service \\
+\textbf{SMTP}  & Simple Mail Transfer Protocol \\
+\textbf{SOL}   & Solana (cryptocurrency token) \\
+\textbf{SQL}   & Structured Query Language \\
+\textbf{SSH}   & Secure Shell \\
+\textbf{UI}    & User Interface \\
+\textbf{URL}   & Uniform Resource Locator \\
+\textbf{UUID}  & Universally Unique Identifier \\
+\end{tabular}
+\renewcommand{\arraystretch}{1.0}
+
+\clearpage
+
+%==========================================================
+%  MAIN MATTER
+%==========================================================
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\include{chapters/introduction}          % Chapter 1
+\include{chapters/background}            % Chapter 2
+\include{chapters/problem_definition}    % Chapter 3
+\include{chapters/proposed_solution}     % Chapter 4
+\include{chapters/discussion_of_results} % Chapter 5
+\include{chapters/conclusion}            % Chapter 6
+
+%==========================================================
+%  REFERENCES (IEEE style)
+%==========================================================
+\include{chapters/references}
+
+%==========================================================
+%  APPENDICES
+%==========================================================
+\appendix
+\include{chapters/appendices}
+
+\end{document}

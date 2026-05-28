@@ -1,0 +1,32 @@
+\chapter{Conclusion and Future Work}
+
+\section{Conclusion}
+
+This project has presented the design, implementation and verification of an open, self-hostable workflow automation platform built as a small set of cooperating microservices. The platform satisfies the functional objectives stated in Chapter~1 and the explicit functional and non-functional requirements set out in Chapter~3: users can register and authenticate, define workflows consisting of a webhook trigger and an ordered chain of actions, invoke those workflows from external systems, and observe the actions being executed reliably and in order.
+
+The most significant architectural decision in the project was the adoption of the transactional outbox pattern for the webhook ingestion path. By inserting both the business state change and the outbox entry in a single database transaction, the platform side-steps the dual-write problem that otherwise plagues integrations between a relational database and a message broker, and obtains \emph{at-least-once} delivery semantics for every event without requiring a distributed transaction coordinator. The complementary use of Apache Kafka as the asynchronous channel between the processor and the worker, together with manual offset commits in the worker, propagates the same delivery guarantee through the entire execution pipeline.
+
+The implementation also demonstrates that a modern microservices architecture can be built with a relatively small codebase. Each individual service is small enough to be read and understood in a single sitting; the complexity of the system as a whole arises from the interactions between services rather than from any one of them. The TypeScript-on-Node.js stack, combined with Prisma's typed query builder, kept integration friction low and made it possible for a small team to evolve the schema, the API, the workers and the frontend in parallel without breaking each other's work.
+
+Beyond the artefact itself, the project has given the team direct exposure to the design and operation of distributed systems. The team has practised relational schema design, asynchronous programming, container orchestration, continuous deployment with GitHub Actions, and the operational reality of a system in which failures occur and must be tolerated rather than prevented. These are the same skills required of a contemporary professional software engineer.
+
+\section{Limitations of the Current Implementation}
+
+A number of limitations of the present implementation should be acknowledged. First, the platform supports only a single trigger type (incoming webhook) and only two action types (email and Solana transfer); a commercially competitive platform would need to support several hundred integrations. Second, the processor's polling loop, although adequate for the present scale, introduces an avoidable latency of up to two seconds per event; a change-data-capture stream would eliminate this. Third, the worker treats every failure as transient and relies on Kafka re-delivery for retry; there is no dead-letter queue or exponential back-off, which means that a permanently failing action will be retried indefinitely. Fourth, the deployment topology assumes a single virtual machine: there is no orchestration of multiple worker instances, no autoscaling and no production-grade secrets management.
+
+\section{Future Work}
+
+Several concrete enhancements have been identified for future iterations of the platform:
+
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{Action catalogue.} Add additional action types that integrate with widely used SaaS systems such as Slack, Discord, Google Sheets, HubSpot and GitHub. Each new action requires only an action handler in the worker plus a row in the \texttt{AvailableAction} table.
+\item \textbf{Scheduled and polling triggers.} Add trigger types that fire on a cron schedule or that periodically poll an external API for changes, in addition to the present webhook trigger.
+\item \textbf{Change-data-capture for the outbox.} Replace the processor's polling loop with a Debezium connector that streams new outbox rows out of the PostgreSQL write-ahead log directly to Kafka, reducing the per-event latency to milliseconds.
+\item \textbf{Dead-letter queue and retry policy.} Add a dedicated Kafka topic that receives messages whose execution has failed a configurable number of times, and expose a UI for human operators to inspect and replay them.
+\item \textbf{Observability.} Instrument every service with OpenTelemetry traces and Prometheus metrics, and provide a Grafana dashboard that visualises end-to-end execution latency and per-action error rates.
+\item \textbf{Security hardening.} Add rate limiting on the webhook endpoint, signature verification for incoming webhooks, secrets management through HashiCorp Vault, and TLS termination in front of all public-facing services.
+\item \textbf{Kubernetes deployment.} Replace the Docker Compose deployment with a set of Kubernetes manifests, allowing multi-node deployment, autoscaling of the worker based on Kafka consumer lag, and rolling upgrades with zero downtime.
+\item \textbf{Run history and analytics.} Extend the frontend with a dedicated view that lists each \texttt{ZapRun}, the actions that were executed for it, and the timestamp and outcome of each. This requires no schema change because every \texttt{ZapRun} is already persisted.
+\end{enumerate}
+
+Taken together, these enhancements would move the platform from a working reference implementation to a production-ready workflow automation product. Even without them, the platform as it stands serves both as a usable automation tool in its own right and as a compact, end-to-end reference implementation of an event-driven microservices architecture suitable for use in undergraduate and postgraduate courses on distributed systems.

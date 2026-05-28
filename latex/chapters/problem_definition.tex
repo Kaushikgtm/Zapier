@@ -1,0 +1,54 @@
+\chapter{Problem Definition}
+
+\section{Statement of the Problem}
+
+The problem addressed in this project is the design and construction of a reliable, horizontally scalable workflow automation platform using open-source components, such that the platform can be self-hosted by an organisation, extended with new triggers and actions over time, and studied as a reference implementation of a modern event-driven microservices system.
+
+Although workflow automation as a category is well established in the commercial market, the systems that dominate that market are proprietary and exhibit a number of limitations that motivate the alternative described here. First, they offer no control over the infrastructure on which the user's data is processed; sensitive payloads belonging to one organisation are routed through the shared infrastructure of a third party. Second, their pricing is based on the number of executed tasks, which renders very high-frequency automations economically unfeasible. Third, they cannot be customised at the source-code level, which prevents the integration of bespoke action types that interact with internal corporate systems. Finally, no commercial offering provides a transparent, fully open implementation that students of distributed systems can read, modify and run for instructional purposes.
+
+The technical heart of the problem is therefore reliable event delivery: an arriving webhook event must be acknowledged quickly, must never be silently dropped, must be processed exactly once in the absence of failure (and at least once in the presence of failure), and must drive the sequential execution of an arbitrary chain of user-defined actions even though those actions may take significantly longer to complete than the original webhook request.
+
+\section{Functional Requirements}
+
+The platform must support the following functional requirements:
+
+\begin{enumerate}[label=FR-\arabic*., leftmargin=*]
+\item A user shall be able to register an account using an email address and a password.
+\item A registered user shall be able to authenticate and receive a session token.
+\item An authenticated user shall be able to create, list and view workflows (Zaps), each consisting of a trigger and one or more ordered actions.
+\item Each created Zap shall be reachable through a unique public webhook URL that accepts an arbitrary JSON payload.
+\item On receipt of a webhook, the platform shall record the event and shall execute the configured actions in the user-specified order.
+\item The platform shall support at least two distinct action types: sending a transactional email and sending a Solana cryptocurrency transfer.
+\item Action metadata shall support template substitution from the webhook payload so that user-supplied strings such as ``\texttt{Hello \{user.name\}}'' resolve at execution time.
+\item The list of available trigger and action types shall be exposed to the frontend so that the Zap-builder UI is data-driven.
+\end{enumerate}
+
+\section{Non-Functional Requirements}
+
+In addition, the platform shall satisfy the following non-functional requirements:
+
+\begin{enumerate}[label=NFR-\arabic*., leftmargin=*]
+\item \textbf{Durability.} No webhook event that has been acknowledged with an HTTP 200 response may be lost, even if downstream components (the message broker, the worker) are temporarily unavailable at the time the webhook is received.
+\item \textbf{At-least-once execution.} Each configured action of an accepted Zap run must eventually execute, even if the worker crashes mid-execution. Duplicate execution of an action under failure conditions is acceptable.
+\item \textbf{Ordered execution.} The actions of a single Zap run must execute in the order specified by the \texttt{sortingOrder} of the action records.
+\item \textbf{Horizontal scalability.} The webhook-receiving service, the API service and the worker service must each be independently replicable so that additional capacity can be added without architectural change.
+\item \textbf{Statelessness of service replicas.} Replicas of the API, hook and worker services must share no in-memory state other than the contents of the database and the Kafka log.
+\item \textbf{Operability.} The full system must run with a single \texttt{docker compose up} on a developer machine, and must be deployable to a single production virtual machine without manual coordination between services.
+\item \textbf{Security.} Passwords must be stored only in salted, hashed form. Authenticated endpoints must reject requests that do not present a valid token. Action secrets (SMTP credentials, blockchain private key) must be configurable through environment variables rather than committed to source.
+\end{enumerate}
+
+\section{Constraints and Assumptions}
+
+The implementation operates under the following constraints and assumptions:
+
+\begin{itemize}
+\item Only a single trigger type, namely an incoming HTTP webhook, is implemented in this iteration. Polling triggers and scheduled triggers are deferred to future work.
+\item Only two action types, email and Solana transfer, are implemented. The architecture, however, does not preclude additional action types from being added without schema change because all action-specific parameters are stored in a JSON metadata column.
+\item The deployment target is a single virtual machine running Docker Compose; a Kubernetes deployment is out of scope. The architecture assumes a single PostgreSQL instance and a single Kafka broker, both of which are sufficient for the expected workload of this iteration.
+\item Webhook payloads are assumed to be JSON and to fit within the body-size limits imposed by the Express framework's default body parser.
+\item External services (the SMTP provider and the Solana RPC endpoint) are assumed to be available; transient unavailability is handled by Kafka redelivery, but persistent unavailability is reported as a worker error and left for human investigation.
+\end{itemize}
+
+\section{Significance of the Problem}
+
+Solving this problem produces three concrete outcomes. The first is a usable workflow automation tool that an individual or a small organisation can deploy in-house, free of recurring per-task licence costs, with full control over the data being processed. The second is an open codebase that demonstrates the practical application of the transactional outbox pattern, event streaming, and stateless microservice replication, all in a domain whose business logic is intuitive enough to make the architectural choices clearly visible. The third, more general outcome is a body of design and implementation experience for the project team, covering distributed systems, asynchronous programming, relational schema design, container orchestration and continuous deployment, all of which are directly applicable to professional software engineering practice.

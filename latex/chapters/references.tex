@@ -1,0 +1,98 @@
+% Rename the auto-generated chapter heading of thebibliography from
+% "Bibliography" (default) to "References".
+\renewcommand{\bibname}{References}
+
+% IEEE reference style: numeric citations, numbered list.
+% Each entry is followed by a one-line annotation in italic indicating the
+% type of source (book / journal / RFC / online documentation / industry article)
+% and where in this project it was consulted.
+
+{\setstretch{1.0}
+\small
+\begin{thebibliography}{99}
+\addcontentsline{toc}{chapter}{References}
+\markboth{REFERENCES}{REFERENCES}
+\setlength{\itemsep}{2pt}
+
+\bibitem{fowler2014microservices}
+M.~Fowler and J.~Lewis, ``Microservices: A definition of this new architectural term,'' \emph{martinfowler.com}, Mar. 2014. [Online]. Available: \url{https://martinfowler.com/articles/microservices.html}.\\
+\textit{Industry article; foundational definition of the microservices style, consulted while designing the five-service decomposition in Ch.~4.}
+
+\bibitem{richardson2018microservices}
+C.~Richardson, \emph{Microservices Patterns: With Examples in Java}. Shelter Island, NY, USA: Manning Publications, 2018, ch.~3, ``Transactional Outbox Pattern''.\\
+\textit{Reference textbook; primary source for the transactional outbox pattern applied in the hook service (Ch.~2 \S 3, Ch.~4 \S Hook).}
+
+\bibitem{microservicesio_outbox}
+C.~Richardson, ``Pattern: Transactional outbox,'' \emph{microservices.io}, 2017. [Online]. Available: \url{https://microservices.io/patterns/data/transactional-outbox.html}.\\
+\textit{Online pattern catalogue; complements~\cite{richardson2018microservices} with a concise specification of the outbox-poller variant we implemented.}
+
+\bibitem{kleppmann2017dia}
+M.~Kleppmann, \emph{Designing Data-Intensive Applications}. Sebastopol, CA, USA: O'Reilly Media, 2017.\\
+\textit{Reference textbook; consulted for the discussion of dual-write inconsistency, at-least-once delivery and stream-processing trade-offs (Ch.~2--3).}
+
+\bibitem{narkhede2017kafka}
+N.~Narkhede, G.~Shapira, and T.~Palino, \emph{Kafka: The Definitive Guide}. Sebastopol, CA, USA: O'Reilly Media, 2017.\\
+\textit{Reference textbook; consumer-group rebalancing and manual-offset semantics described here directly informed the worker design (Ch.~4 \S Worker).}
+
+\bibitem{kafka_docs}
+Apache Software Foundation, ``Apache Kafka documentation,'' 2024. [Online]. Available: \url{https://kafka.apache.org/documentation/}.\\
+\textit{Official documentation; authoritative source for Kafka producer/consumer APIs and broker configuration used in the processor and worker services.}
+
+\bibitem{kreps2014log}
+J.~Kreps, ``The log: What every software engineer should know about real-time data's unifying abstraction,'' \emph{LinkedIn Engineering Blog}, Dec. 2013. [Online]. Available: \url{https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying}.\\
+\textit{Industry article; conceptual framing of the partitioned-log abstraction that motivates the use of Kafka in Ch.~2.}
+
+\bibitem{jones2015jwt}
+M.~Jones, J.~Bradley, and N.~Sakimura, \emph{JSON Web Token (JWT)}, RFC~7519, Internet Engineering Task Force, May 2015. [Online]. Available: \url{https://www.rfc-editor.org/rfc/rfc7519}.\\
+\textit{IETF standard (RFC); normative specification for the JWT format issued by the primary backend after successful sign-in (Ch.~4 \S Primary Backend).}
+
+\bibitem{provos1999bcrypt}
+N.~Provos and D.~Mazi\`{e}res, ``A future-adaptable password scheme,'' in \emph{Proc.\ USENIX Annual Technical Conference, FREENIX Track}, Monterey, CA, USA, Jun. 1999, pp.~81--91.\\
+\textit{Peer-reviewed conference paper; original description of the bcrypt password-hashing algorithm used to store user passwords (NFR-7).}
+
+\bibitem{fielding2000rest}
+R.~T.~Fielding, ``Architectural styles and the design of network-based software architectures,'' Ph.D.\ dissertation, Univ.\ of California, Irvine, CA, USA, 2000.\\
+\textit{Doctoral dissertation; canonical formulation of the REST style that shapes the primary backend's HTTP endpoint design (Ch.~4 Table~4.2).}
+
+\bibitem{postgresql_docs}
+PostgreSQL Global Development Group, ``PostgreSQL 16 documentation,'' 2024. [Online]. Available: \url{https://www.postgresql.org/docs/16/}.\\
+\textit{Official documentation; consulted for transaction isolation guarantees relied on by the hook's \texttt{\$transaction} block (Ch.~4 \S Hook).}
+
+\bibitem{prisma_docs}
+Prisma Data, Inc., ``Prisma ORM documentation,'' 2024. [Online]. Available: \url{https://www.prisma.io/docs}.\\
+\textit{Official documentation; primary reference for schema modelling, migrations and the typed query API used across all backend services.}
+
+\bibitem{nextjs_docs}
+Vercel, Inc., ``Next.js documentation,'' 2024. [Online]. Available: \url{https://nextjs.org/docs}.\\
+\textit{Official documentation; used for App-Router conventions, server components and styling integration in the frontend (Ch.~4 \S Frontend).}
+
+\bibitem{express_docs}
+OpenJS Foundation, ``Express -- Node.js web application framework,'' 2024. [Online]. Available: \url{https://expressjs.com/}.\\
+\textit{Official documentation; reference for routing, middleware composition and request validation in the primary backend and hook services.}
+
+\bibitem{nodemailer_docs}
+A.~Reinman, ``Nodemailer -- Send e-mails with Node.js,'' 2024. [Online]. Available: \url{https://nodemailer.com/}.\\
+\textit{Library documentation; reference for SMTP transport configuration used by the worker's \texttt{email} action.}
+
+\bibitem{solana_web3}
+Solana Labs, ``@solana/web3.js library documentation,'' 2024. [Online]. Available: \url{https://solana-labs.github.io/solana-web3.js/}.\\
+\textit{Library documentation; reference for transaction construction and signing used by the worker's \texttt{send-sol} action.}
+
+\bibitem{docker_docs}
+Docker, Inc., ``Docker and Docker Compose documentation,'' 2024. [Online]. Available: \url{https://docs.docker.com/}.\\
+\textit{Official documentation; basis for the per-service \texttt{Dockerfile}s and the \texttt{docker-compose.yml} orchestration described in Ch.~4 \S Frontend and Deployment.}
+
+\bibitem{typescript_docs}
+Microsoft Corporation, ``TypeScript handbook,'' 2024. [Online]. Available: \url{https://www.typescriptlang.org/docs/}.\\
+\textit{Official documentation; language reference for the TypeScript codebase shared across all five services.}
+
+\bibitem{zod_docs}
+C.~McDonnell, ``Zod -- TypeScript-first schema validation,'' 2024. [Online]. Available: \url{https://zod.dev/}.\\
+\textit{Library documentation; reference for input-schema validation used by every authenticated endpoint of the primary backend.}
+
+\bibitem{github_actions_docs}
+GitHub, Inc., ``GitHub Actions documentation,'' 2024. [Online]. Available: \url{https://docs.github.com/en/actions}.\\
+\textit{Official documentation; basis for the change-detection and deploy workflow shown in Figure~4.4 (CI/CD pipeline).}
+
+\end{thebibliography}
+}% end \setstretch group
